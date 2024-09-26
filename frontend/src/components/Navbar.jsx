@@ -29,8 +29,8 @@ const Navbar = () => {
           <p>STAFF</p>
           <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden" />
         </NavLink>
-        <NavLink to="/salary" className="flex flex-col items-center gap-1">
-          <p>SALARY</p>
+        <NavLink to="/income" className="flex flex-col items-center gap-1">
+          <p>INCOME</p>
           <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden" />
         </NavLink>
         <NavLink to="/*" className="flex flex-col items-center gap-1">
