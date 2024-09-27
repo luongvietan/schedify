@@ -1,4 +1,3 @@
-// routes/employee.js
 const express = require("express");
 const Employee = require("../models/Employee");
 const router = express.Router();
@@ -8,7 +7,8 @@ router.get("/", async (req, res) => {
   const employees = await Employee.find();
   res.json(employees);
 });
-/// Lấy thông tin nhân viên theo ID
+
+// Lấy thông tin nhân viên theo ID
 router.get("/:employeeCode", async (req, res) => {
   try {
     const employeeCode = req.params.employeeCode;
@@ -22,6 +22,7 @@ router.get("/:employeeCode", async (req, res) => {
     res.status(500).json({ message: "Lỗi khi lấy thông tin nhân viên" });
   }
 });
+
 // Thêm nhân viên mới
 router.post("/", async (req, res) => {
   const newEmployee = new Employee(req.body);
@@ -40,7 +41,16 @@ router.delete("/:employeeCode", async (req, res) => {
   }
 });
 
-// Sửa thông tin nhân viên
+// Reset tháng làm việc
+router.put("/reset", async (req, res) => {
+  try {
+    await Employee.updateMany({}, { $set: { shifts: 0, salary: 0 } });
+    res.status(200).send({ message: "Employees reset successfully." });
+  } catch (error) {
+    res.status(500).send({ message: "Error resetting employees.", error });
+  }
+});
+
 // Sửa thông tin nhân viên
 router.put("/:employeeCode", async (req, res) => {
   try {

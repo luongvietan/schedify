@@ -30,6 +30,22 @@ const Staff = () => {
     }
   };
 
+  const resetShiftsAndSalary = async () => {
+    try {
+      await api.put("/api/employees/reset"); // Gửi yêu cầu reset tới backend
+      const updatedEmployees = employees.map((emp) => ({
+        ...emp,
+        shifts: 0,
+        salary: 0,
+      }));
+      setEmployees(updatedEmployees); // Cập nhật trạng thái với giá trị mới
+      setErrorMessage(""); // Reset lỗi nếu thành công
+    } catch (error) {
+      setErrorMessage("Reset failed. Please try again."); // Hiển thị thông báo lỗi
+      console.error("Reset failed:", error);
+    }
+  };
+
   useEffect(() => {
     const fetchEmployees = async () => {
       const response = await api.get("/api/employees");
@@ -69,6 +85,14 @@ const Staff = () => {
               <th className="px-4 py-3">Shifts</th>
               <th className="px-4 py-3">Salary</th>
               <th className="px-2 py-3"></th>
+              <th className="px-2 py-3">
+                <button
+                  onClick={resetShiftsAndSalary}
+                  className="text-green-700 hover:text-white border border-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:border-green-500 dark:text-green-500 dark:hover:text-white dark:hover:bg-green-600 dark:focus:ring-green-900"
+                >
+                  Reset Month
+                </button>
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -128,8 +152,7 @@ const Staff = () => {
                   <label className="block text-sm font-medium text-gray-700">
                     Gender
                   </label>
-                  <input
-                    type="text"
+                  <select
                     className="block w-full p-2 pl-10 text-sm text-gray-700 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
                     value={selectedEmployee.gender}
                     onChange={(e) =>
@@ -138,14 +161,16 @@ const Staff = () => {
                         gender: e.target.value,
                       })
                     }
-                  />
+                  >
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                  </select>
                 </div>
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700">
                     Level
                   </label>
-                  <input
-                    type="number"
+                  <select
                     className="block w-full p-2 pl-10 text-sm text-gray-700 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
                     value={selectedEmployee.level}
                     onChange={(e) =>
@@ -154,7 +179,11 @@ const Staff = () => {
                         level: parseInt(e.target.value),
                       })
                     }
-                  />
+                  >
+                    <option value={1}>1</option>
+                    <option value={2}>2</option>
+                    <option value={3}>3</option>
+                  </select>
                 </div>
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700">
@@ -168,22 +197,6 @@ const Staff = () => {
                       setSelectedEmployee({
                         ...selectedEmployee,
                         shifts: parseInt(e.target.value),
-                      })
-                    }
-                  />
-                </div>
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700">
-                    Salary
-                  </label>
-                  <input
-                    type="number"
-                    className="block w-full p-2 pl-10 text-sm text-gray-700 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
-                    value={selectedEmployee.salary}
-                    onChange={(e) =>
-                      setSelectedEmployee({
-                        ...selectedEmployee,
-                        salary: parseInt(e.target.value),
                       })
                     }
                   />
