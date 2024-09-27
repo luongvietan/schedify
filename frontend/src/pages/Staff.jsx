@@ -4,6 +4,14 @@ import api from "../api";
 const Staff = () => {
   const [employees, setEmployees] = useState([]);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [newEmployee, setNewEmployee] = useState({
+    name: "",
+    gender: "Male",
+    level: 1,
+    shifts: 0,
+    salary: 0,
+  });
+  const [showAddForm, setShowAddForm] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
   const removeEmployee = async (eid) => {
@@ -43,6 +51,38 @@ const Staff = () => {
     } catch (error) {
       setErrorMessage("Reset failed. Please try again."); // Hiển thị thông báo lỗi
       console.error("Reset failed:", error);
+    }
+  };
+
+  const addEmployee = async (e) => {
+    e.preventDefault(); // Ngăn chặn reload trang
+    try {
+      // Tạo employeeCode tự động
+      const lastEmployeeCode =
+        employees.length > 0
+          ? employees[employees.length - 1].employeeCode
+          : "E0000";
+      const newCodeNumber = parseInt(lastEmployeeCode.slice(1)) + 1; // Lấy số sau "E" và tăng lên 1
+      const newEmployeeCode = `E${newCodeNumber.toString().padStart(4, "0")}`;
+
+      // Gửi yêu cầu thêm nhân viên mới
+      const response = await api.post("/api/employees", {
+        ...newEmployee,
+        employeeCode: newEmployeeCode,
+      });
+      setEmployees([...employees, response.data]); // Cập nhật danh sách nhân viên với nhân viên mới
+      setShowAddForm(false); // Ẩn form thêm nhân viên
+      setNewEmployee({
+        name: "",
+        gender: "Male",
+        level: 1,
+        shifts: 0,
+        salary: 0,
+      }); // Reset form
+      setErrorMessage(""); // Reset lỗi nếu thành công
+    } catch (error) {
+      setErrorMessage("Failed to add employee. Please try again."); // Hiển thị thông báo lỗi
+      console.error("Add employee failed:", error);
     }
   };
 
@@ -91,6 +131,12 @@ const Staff = () => {
                   className="text-green-700 hover:text-white border border-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:border-green-500 dark:text-green-500 dark:hover:text-white dark:hover:bg-green-600 dark:focus:ring-green-900"
                 >
                   Reset Month
+                </button>
+                <button
+                  onClick={() => setShowAddForm(true)}
+                  className="ml-2 text-blue-700 hover:text-white border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:border-blue-500 dark:text-blue-500 dark:hover:text-white dark:hover:bg-blue-600 dark:focus:ring-blue-900"
+                >
+                  Add Employee
                 </button>
               </th>
             </tr>
@@ -211,6 +257,107 @@ const Staff = () => {
                   type="button" // Đảm bảo đây là một button hủy
                   className="text-gray-700 hover:text-white border border-gray-700 hover:bg-gray-800 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:border-gray-500 dark:text-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-900"
                   onClick={handleCancel}
+                >
+                  Cancel
+                </button>
+              </form>
+            </div>
+          </div>
+        )}
+        {showAddForm && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+            <div className="bg-white rounded-lg p-8 shadow-lg max-w-lg w-full">
+              <h2 className="text-lg font-bold">Add Employee</h2>
+              <form onSubmit={addEmployee}>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Name
+                  </label>
+                  <input
+                    type="text"
+                    className="block w-full p-2 pl-10 text-sm text-gray-700 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                    value={newEmployee.name}
+                    onChange={(e) =>
+                      setNewEmployee({ ...newEmployee, name: e.target.value })
+                    }
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Gender
+                  </label>
+                  <select
+                    className="block w-full p-2 pl-10 text-sm text-gray-700 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                    value={newEmployee.gender}
+                    onChange={(e) =>
+                      setNewEmployee({ ...newEmployee, gender: e.target.value })
+                    }
+                  >
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                  </select>
+                </div>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Level
+                  </label>
+                  <select
+                    className="block w-full p-2 pl-10 text-sm text-gray-700 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                    value={newEmployee.level}
+                    onChange={(e) =>
+                      setNewEmployee({
+                        ...newEmployee,
+                        level: parseInt(e.target.value),
+                      })
+                    }
+                  >
+                    <option value={1}>1</option>
+                    <option value={2}>2</option>
+                    <option value={3}>3</option>
+                  </select>
+                </div>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Shifts
+                  </label>
+                  <input
+                    type="number"
+                    className="block w-full p-2 pl-10 text-sm text-gray-700 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                    value={newEmployee.shifts}
+                    onChange={(e) =>
+                      setNewEmployee({
+                        ...newEmployee,
+                        shifts: parseInt(e.target.value),
+                      })
+                    }
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Salary
+                  </label>
+                  <input
+                    type="number"
+                    className="block w-full p-2 pl-10 text-sm text-gray-700 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                    value={newEmployee.salary}
+                    onChange={(e) =>
+                      setNewEmployee({
+                        ...newEmployee,
+                        salary: parseFloat(e.target.value),
+                      })
+                    }
+                  />
+                </div>
+                <button
+                  type="submit" // Đảm bảo đây là một button gửi form
+                  className="text-blue-700 hover:text-white border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:border-blue-500 dark:text-blue-500 dark:hover:text-white dark:hover:bg-blue-600 dark:focus:ring-blue-900"
+                >
+                  Add
+                </button>
+                <button
+                  type="button" // Đảm bảo đây là một button hủy
+                  className="text-gray-700 hover:text-white border border-gray-700 hover:bg-gray-800 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:border-gray-500 dark:text-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-900"
+                  onClick={() => setShowAddForm(false)}
                 >
                   Cancel
                 </button>
