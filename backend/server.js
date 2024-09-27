@@ -3,6 +3,7 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const employeeRoutes = require("./routes/employee");
+const scheduleRoutes = require("./routes/schedule"); // Thêm route cho schedule
 
 const app = express();
 app.use(cors());
@@ -10,7 +11,7 @@ const PORT = process.env.PORT || 3000;
 
 // Kết nối đến MongoDB
 mongoose
-  .connect("mongodb://localhost:27017/schedify")
+  .connect("mongodb://localhost:27017/schedify", {})
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.error("Could not connect to MongoDB", err));
 
@@ -19,6 +20,9 @@ app.use(bodyParser.json());
 
 // Định tuyến cho API nhân viên
 app.use("/api/employees", employeeRoutes);
+
+// Định tuyến cho API lịch trình làm việc
+app.use("/api/schedule", scheduleRoutes); // Thêm định tuyến cho lịch trình làm việc
 
 // Route trang chủ
 app.get("/", (req, res) => {

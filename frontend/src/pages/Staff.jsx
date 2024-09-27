@@ -155,8 +155,7 @@ const Staff = () => {
               <th className="px-4 py-3">Level</th>
               <th className="px-4 py-3">Shifts</th>
               <th className="px-4 py-3">Salary</th>
-              <th className="px-4 py-3 text-center">Actions</th>{" "}
-              {/* Center align Actions header */}
+              <th className="px-4 py-3 text-center">Actions</th>
             </tr>
           </thead>
           <tbody>

@@ -1,0 +1,126 @@
+[
+  {
+    "week": 40,
+    "days": [
+      {
+        "date": "2024-09-30",
+        "shifts": {
+          "Ca1": [
+            { "employeeCode": "E001" },
+            { "employeeCode": "E002" }
+          ],
+          "Ca2": [
+            { "employeeCode": "E003" },
+            { "employeeCode": "E004" }
+          ],
+          "Ca3": [
+            { "employeeCode": "E005" },
+            { "employeeCode": "E006" }
+          ]
+        }
+      },
+      {
+        "date": "2024-10-01",
+        "shifts": {
+          "Ca1": [
+            { "employeeCode": "E007" },
+            { "employeeCode": "E008" }
+          ],
+          "Ca2": [
+            { "employeeCode": "E009" },
+            { "employeeCode": "E010" }
+          ],
+          "Ca3": [
+            { "employeeCode": "E011" },
+            { "employeeCode": "E012" }
+          ]
+        }
+      },
+      {
+        "date": "2024-10-02",
+        "shifts": {
+          "Ca1": [
+            { "employeeCode": "E013" },
+            { "employeeCode": "E014" }
+          ],
+          "Ca2": [
+            { "employeeCode": "E015" },
+            { "employeeCode": "E016" }
+          ],
+          "Ca3": [
+            { "employeeCode": "E001" },
+            { "employeeCode": "E002" }
+          ]
+        }
+      },
+      {
+        "date": "2024-10-03",
+        "shifts": {
+          "Ca1": [
+            { "employeeCode": "E003" },
+            { "employeeCode": "E004" }
+          ],
+          "Ca2": [
+            { "employeeCode": "E005" },
+            { "employeeCode": "E006" }
+          ],
+          "Ca3": [
+            { "employeeCode": "E007" },
+            { "employeeCode": "E008" }
+          ]
+        }
+      },
+      {
+        "date": "2024-10-04",
+        "shifts": {
+          "Ca1": [
+            { "employeeCode": "E009" },
+            { "employeeCode": "E010" }
+          ],
+          "Ca2": [
+            { "employeeCode": "E011" },
+            { "employeeCode": "E012" }
+          ],
+          "Ca3": [
+            { "employeeCode": "E013" },
+            { "employeeCode": "E014" }
+          ]
+        }
+      },
+      {
+        "date": "2024-10-05",
+        "shifts": {
+          "Ca1": [
+            { "employeeCode": "E015" },
+            { "employeeCode": "E016" }
+          ],
+          "Ca2": [
+            { "employeeCode": "E001" },
+            { "employeeCode": "E002" }
+          ],
+          "Ca3": [
+            { "employeeCode": "E003" },
+            { "employeeCode": "E004" }
+          ]
+        }
+      },
+      {
+        "date": "2024-10-06",
+        "shifts": {
+          "Ca1": [
+            { "employeeCode": "E005" },
+            { "employeeCode": "E006" }
+          ],
+          "Ca2": [
+            { "employeeCode": "E007" },
+            { "employeeCode": "E008" }
+          ],
+          "Ca3": [
+            { "employeeCode": "E009" },
+            { "employeeCode": "E010" }
+          ]
+        }
+      }
+    ]
+  }
+]
