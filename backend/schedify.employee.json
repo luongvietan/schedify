@@ -1,23 +1,162 @@
 [
-    { "employeeCode": "E001", "name": "John Doe", "gender": "Male", "level": "Senior", "shifts": 10, "salary": 80000 },
-    { "employeeCode": "E002", "name": "Jane Smith", "gender": "Female", "level": "Junior", "shifts": 8, "salary": 50000 },
-    { "employeeCode": "E003", "name": "Michael Brown", "gender": "Male", "level": "Mid", "shifts": 9, "salary": 60000 },
-    { "employeeCode": "E004", "name": "Emily Davis", "gender": "Female", "level": "Senior", "shifts": 11, "salary": 85000 },
-    { "employeeCode": "E005", "name": "Chris Wilson", "gender": "Male", "level": "Junior", "shifts": 7, "salary": 52000 },
-    { "employeeCode": "E006", "name": "Sarah Lee", "gender": "Female", "level": "Mid", "shifts": 9, "salary": 58000 },
-    { "employeeCode": "E007", "name": "David Kim", "gender": "Male", "level": "Senior", "shifts": 10, "salary": 82000 },
-    { "employeeCode": "E008", "name": "Sophia Martinez", "gender": "Female", "level": "Junior", "shifts": 8, "salary": 51000 },
-    { "employeeCode": "E009", "name": "Daniel Anderson", "gender": "Male", "level": "Mid", "shifts": 9, "salary": 61000 },
-    { "employeeCode": "E010", "name": "Olivia Taylor", "gender": "Female", "level": "Senior", "shifts": 11, "salary": 86000 },
-    { "employeeCode": "E011", "name": "Ethan Clark", "gender": "Male", "level": "Junior", "shifts": 7, "salary": 53000 },
-    { "employeeCode": "E012", "name": "Chloe White", "gender": "Female", "level": "Mid", "shifts": 9, "salary": 59000 },
-    { "employeeCode": "E013", "name": "Aiden Harris", "gender": "Male", "level": "Senior", "shifts": 10, "salary": 83000 },
-    { "employeeCode": "E014", "name": "Lily King", "gender": "Female", "level": "Junior", "shifts": 8, "salary": 52000 },
-    { "employeeCode": "E015", "name": "Lucas Wright", "gender": "Male", "level": "Mid", "shifts": 9, "salary": 62000 },
-    { "employeeCode": "E016", "name": "Mia Robinson", "gender": "Female", "level": "Senior", "shifts": 11, "salary": 87000 },
-    { "employeeCode": "E017", "name": "Mason Walker", "gender": "Male", "level": "Junior", "shifts": 7, "salary": 54000 },
-    { "employeeCode": "E018", "name": "Amelia Hall", "gender": "Female", "level": "Mid", "shifts": 9, "salary": 60000 },
-    { "employeeCode": "E019", "name": "James Young", "gender": "Male", "level": "Senior", "shifts": 10, "salary": 84000 },
-    { "employeeCode": "E020", "name": "Charlotte Scott", "gender": "Female", "level": "Junior", "shifts": 8, "salary": 53000 }
-  ]
-  
+  {
+    "employeeCode": "E001",
+    "name": "John Doe",
+    "gender": "Male",
+    "level": 1,
+    "shifts": 10,
+    "salary": 80000
+  },
+  {
+    "employeeCode": "E002",
+    "name": "Jane Smith",
+    "gender": "Female",
+    "level": 2,
+    "shifts": 8,
+    "salary": 50000
+  },
+  {
+    "employeeCode": "E003",
+    "name": "Michael Brown",
+    "gender": "Male",
+    "level": 3,
+    "shifts": 9,
+    "salary": 60000
+  },
+  {
+    "employeeCode": "E004",
+    "name": "Emily Davis",
+    "gender": "Female",
+    "level": 1,
+    "shifts": 11,
+    "salary": 85000
+  },
+  {
+    "employeeCode": "E005",
+    "name": "Chris Wilson",
+    "gender": "Male",
+    "level": 2,
+    "shifts": 7,
+    "salary": 52000
+  },
+  {
+    "employeeCode": "E006",
+    "name": "Sarah Lee",
+    "gender": "Female",
+    "level": 1,
+    "shifts": 9,
+    "salary": 58000
+  },
+  {
+    "employeeCode": "E007",
+    "name": "David Kim",
+    "gender": "Male",
+    "level": 1,
+    "shifts": 10,
+    "salary": 82000
+  },
+  {
+    "employeeCode": "E008",
+    "name": "Sophia Martinez",
+    "gender": "Female",
+    "level": 1,
+    "shifts": 8,
+    "salary": 51000
+  },
+  {
+    "employeeCode": "E009",
+    "name": "Daniel Anderson",
+    "gender": "Male",
+    "level": 1,
+    "shifts": 9,
+    "salary": 61000
+  },
+  {
+    "employeeCode": "E010",
+    "name": "Olivia Taylor",
+    "gender": "Female",
+    "level": 1,
+    "shifts": 11,
+    "salary": 86000
+  },
+  {
+    "employeeCode": "E011",
+    "name": "Ethan Clark",
+    "gender": "Male",
+    "level": 2,
+    "shifts": 7,
+    "salary": 53000
+  },
+  {
+    "employeeCode": "E012",
+    "name": "Chloe White",
+    "gender": "Female",
+    "level": 1,
+    "shifts": 9,
+    "salary": 59000
+  },
+  {
+    "employeeCode": "E013",
+    "name": "Aiden Harris",
+    "gender": "Male",
+    "level": 3,
+    "shifts": 10,
+    "salary": 83000
+  },
+  {
+    "employeeCode": "E014",
+    "name": "Lily King",
+    "gender": "Female",
+    "level": 3,
+    "shifts": 8,
+    "salary": 52000
+  },
+  {
+    "employeeCode": "E015",
+    "name": "Lucas Wright",
+    "gender": "Male",
+    "level": 1,
+    "shifts": 9,
+    "salary": 62000
+  },
+  {
+    "employeeCode": "E016",
+    "name": "Mia Robinson",
+    "gender": "Female",
+    "level": 1,
+    "shifts": 11,
+    "salary": 87000
+  },
+  {
+    "employeeCode": "E017",
+    "name": "Mason Walker",
+    "gender": "Male",
+    "level": 1,
+    "shifts": 7,
+    "salary": 54000
+  },
+  {
+    "employeeCode": "E018",
+    "name": "Amelia Hall",
+    "gender": "Female",
+    "level": 1,
+    "shifts": 9,
+    "salary": 60000
+  },
+  {
+    "employeeCode": "E019",
+    "name": "James Young",
+    "gender": "Male",
+    "level": 1,
+    "shifts": 10,
+    "salary": 84000
+  },
+  {
+    "employeeCode": "E020",
+    "name": "Charlotte Scott",
+    "gender": "Female",
+    "level": 1,
+    "shifts": 8,
+    "salary": 53000
+  }
+]
