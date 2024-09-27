@@ -2,20 +2,59 @@ import { useEffect, useState } from "react";
 import api from "../api";
 
 const Staff = () => {
-  const [products, setProducts] = useState([]);
+  const [employees, setEmployees] = useState([]);
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [errorMessage, setErrorMessage] = useState("");
 
-  // const removeProduct = async (pid) => {
-  //   await api.delete(`/api/employees/${pid}`);
-  //   setProducts(products.filter((product) => product.pid !== pid));
-  // };
+  const removeEmployee = async (eid) => {
+    await api.delete(`/api/employees/${eid}`);
+    setEmployees(employees.filter((employee) => employee.employeeCode !== eid));
+  };
+
+  const updateEmployee = async (employee) => {
+    try {
+      console.log("Updating employee:", employee);
+      const response = await api.put(
+        `/api/employees/${employee.employeeCode}`,
+        employee
+      );
+      setEmployees(
+        employees.map((emp) =>
+          emp.employeeCode === employee.employeeCode ? response.data : emp
+        )
+      );
+      setErrorMessage(""); // Reset lỗi nếu cập nhật thành công
+    } catch (error) {
+      setErrorMessage("Update failed. Please try again."); // Hiển thị thông báo lỗi
+      console.error("Update failed:", error);
+    }
+  };
 
   useEffect(() => {
-    const fetchProducts = async () => {
+    const fetchEmployees = async () => {
       const response = await api.get("/api/employees");
-      setProducts(response.data);
+      setEmployees(response.data);
     };
-    fetchProducts();
+    fetchEmployees();
   }, []);
+
+  const handleEdit = (employee) => {
+    setSelectedEmployee(employee);
+    setErrorMessage(""); // Reset lỗi khi bắt đầu chỉnh sửa
+  };
+
+  const handleSave = async (e) => {
+    e.preventDefault(); // Ngăn chặn reload trang
+    if (selectedEmployee) {
+      await updateEmployee(selectedEmployee);
+      setSelectedEmployee(null);
+    }
+  };
+
+  const handleCancel = () => {
+    setSelectedEmployee(null);
+    setErrorMessage(""); // Reset lỗi khi hủy chỉnh sửa
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -33,29 +72,139 @@ const Staff = () => {
             </tr>
           </thead>
           <tbody>
-            {products.map((product, index) => (
+            {employees.map((employee, index) => (
               <tr
                 className="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
-                key={`${product.pid}-${index}`} // Sử dụng pid kết hợp với index để tạo khóa duy nhất
+                key={`${employee.employeeCode}-${index}`}
               >
-                <td className="px-4 py-4">{product.employeeCode}</td>
-                <td className="px-4 py-4">{product.name}</td>
-                <td className="px-4 py-4">{product.gender}</td>
-                <td className="px-4 py-4">{product.level}</td>
-                <td className="px-4 py-4">{product.shifts}</td>
-                <td className="px-4 py-4">VND {product.salary}</td>
-                <td className="px-6 py-4">
+                <td className="px-4 py-4">{employee.employeeCode}</td>
+                <td className="px-4 py-4">{employee.name}</td>
+                <td className="px-4 py-4">{employee.gender}</td>
+                <td className="px-4 py-4">{employee.level}</td>
+                <td className="px-4 py-4">{employee.shifts}</td>
+                <td className="px-4 py-4">VND {employee.salary}</td>
+                <td className="px-0 py-4 space-x-3 text-right">
                   <button
                     className="text-red-700 hover:text-white border border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900"
-                    // onClick={() => removeProduct(product.pid)}
+                    onClick={() => removeEmployee(employee.employeeCode)}
                   >
                     Remove
+                  </button>
+                  <button
+                    className="text-blue-700 hover:text-white border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:border-blue-500 dark:text-blue-500 dark:hover:text-white dark:hover:bg-blue-600 dark:focus:ring-blue-900"
+                    onClick={() => handleEdit(employee)}
+                  >
+                    Edit
                   </button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
+        {errorMessage && <p className="text-red-500">{errorMessage}</p>}
+        {/* Hiển thị thông báo lỗi */}
+        {selectedEmployee && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+            <div className="bg-white rounded-lg p-8 shadow-lg max-w-lg w-full">
+              <h2 className="text-lg font-bold">Edit Employee</h2>
+              <form onSubmit={handleSave}>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Name
+                  </label>
+                  <input
+                    type="text"
+                    className="block w-full p-2 pl-10 text-sm text-gray-700 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                    value={selectedEmployee.name}
+                    onChange={(e) =>
+                      setSelectedEmployee({
+                        ...selectedEmployee,
+                        name: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Gender
+                  </label>
+                  <input
+                    type="text"
+                    className="block w-full p-2 pl-10 text-sm text-gray-700 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                    value={selectedEmployee.gender}
+                    onChange={(e) =>
+                      setSelectedEmployee({
+                        ...selectedEmployee,
+                        gender: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Level
+                  </label>
+                  <input
+                    type="number"
+                    className="block w-full p-2 pl-10 text-sm text-gray-700 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                    value={selectedEmployee.level}
+                    onChange={(e) =>
+                      setSelectedEmployee({
+                        ...selectedEmployee,
+                        level: parseInt(e.target.value),
+                      })
+                    }
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Shifts
+                  </label>
+                  <input
+                    type="number"
+                    className="block w-full p-2 pl-10 text-sm text-gray-700 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                    value={selectedEmployee.shifts}
+                    onChange={(e) =>
+                      setSelectedEmployee({
+                        ...selectedEmployee,
+                        shifts: parseInt(e.target.value),
+                      })
+                    }
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Salary
+                  </label>
+                  <input
+                    type="number"
+                    className="block w-full p-2 pl-10 text-sm text-gray-700 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                    value={selectedEmployee.salary}
+                    onChange={(e) =>
+                      setSelectedEmployee({
+                        ...selectedEmployee,
+                        salary: parseInt(e.target.value),
+                      })
+                    }
+                  />
+                </div>
+                <button
+                  type="submit" // Đảm bảo đây là một button gửi form
+                  className="text-blue-700 hover:text-white border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:border-blue-500 dark:text-blue-500 dark:hover:text-white dark:hover:bg-blue-600 dark:focus:ring-blue-900"
+                >
+                  Save
+                </button>
+                <button
+                  type="button" // Đảm bảo đây là một button hủy
+                  className="text-gray-700 hover:text-white border border-gray-700 hover:bg-gray-800 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:border-gray-500 dark:text-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-900"
+                  onClick={handleCancel}
+                >
+                  Cancel
+                </button>
+              </form>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -1,15 +1,15 @@
 [
   {
     "employeeCode": "E001",
-    "name": "John Doe",
-    "gender": "Male",
+    "name": "Thu Ha",
+    "gender": "Female",
     "level": 1,
     "shifts": 10,
     "salary": 80000
   },
   {
     "employeeCode": "E002",
-    "name": "Jane Smith",
+    "name": "Ngoc Tram",
     "gender": "Female",
     "level": 2,
     "shifts": 8,
@@ -17,15 +17,15 @@
   },
   {
     "employeeCode": "E003",
-    "name": "Michael Brown",
-    "gender": "Male",
+    "name": "Bao Ngoc",
+    "gender": "Female",
     "level": 3,
     "shifts": 9,
     "salary": 60000
   },
   {
     "employeeCode": "E004",
-    "name": "Emily Davis",
+    "name": "Nhu Y",
     "gender": "Female",
     "level": 1,
     "shifts": 11,
@@ -33,15 +33,15 @@
   },
   {
     "employeeCode": "E005",
-    "name": "Chris Wilson",
-    "gender": "Male",
+    "name": "Truc Quynh",
+    "gender": "Female",
     "level": 2,
     "shifts": 7,
     "salary": 52000
   },
   {
     "employeeCode": "E006",
-    "name": "Sarah Lee",
+    "name": "My Huyen",
     "gender": "Female",
     "level": 1,
     "shifts": 9,
@@ -49,55 +49,55 @@
   },
   {
     "employeeCode": "E007",
-    "name": "David Kim",
-    "gender": "Male",
+    "name": "Kim Xuyen",
+    "gender": "Female",
     "level": 1,
     "shifts": 10,
     "salary": 82000
   },
   {
     "employeeCode": "E008",
-    "name": "Sophia Martinez",
-    "gender": "Female",
+    "name": "Toan",
+    "gender": "Male",
     "level": 1,
     "shifts": 8,
     "salary": 51000
   },
   {
     "employeeCode": "E009",
-    "name": "Daniel Anderson",
-    "gender": "Male",
+    "name": "Vo Nhu Y",
+    "gender": "Female",
     "level": 1,
     "shifts": 9,
     "salary": 61000
   },
   {
     "employeeCode": "E010",
-    "name": "Olivia Taylor",
-    "gender": "Female",
+    "name": "Viet An",
+    "gender": "Male",
     "level": 1,
     "shifts": 11,
     "salary": 86000
   },
   {
     "employeeCode": "E011",
-    "name": "Ethan Clark",
-    "gender": "Male",
+    "name": "Diem",
+    "gender": "Female",
     "level": 2,
     "shifts": 7,
     "salary": 53000
   },
   {
     "employeeCode": "E012",
-    "name": "Chloe White",
-    "gender": "Female",
+    "name": "Vi Minh",
+    "gender": "Male",
     "level": 1,
     "shifts": 9,
     "salary": 59000
   },
   {
     "employeeCode": "E013",
-    "name": "Aiden Harris",
+    "name": "Tan Thuan",
     "gender": "Male",
     "level": 3,
     "shifts": 10,
@@ -105,7 +105,7 @@
   },
   {
     "employeeCode": "E014",
-    "name": "Lily King",
+    "name": "Thuy Van",
     "gender": "Female",
     "level": 3,
     "shifts": 8,
@@ -113,50 +113,18 @@
   },
   {
     "employeeCode": "E015",
-    "name": "Lucas Wright",
-    "gender": "Male",
+    "name": "Minh Anh",
+    "gender": "Female",
     "level": 1,
     "shifts": 9,
     "salary": 62000
   },
   {
     "employeeCode": "E016",
-    "name": "Mia Robinson",
-    "gender": "Female",
+    "name": "Phi Son",
+    "gender": "Male",
     "level": 1,
     "shifts": 11,
     "salary": 87000
-  },
-  {
-    "employeeCode": "E017",
-    "name": "Mason Walker",
-    "gender": "Male",
-    "level": 1,
-    "shifts": 7,
-    "salary": 54000
-  },
-  {
-    "employeeCode": "E018",
-    "name": "Amelia Hall",
-    "gender": "Female",
-    "level": 1,
-    "shifts": 9,
-    "salary": 60000
-  },
-  {
-    "employeeCode": "E019",
-    "name": "James Young",
-    "gender": "Male",
-    "level": 1,
-    "shifts": 10,
-    "salary": 84000
-  },
-  {
-    "employeeCode": "E020",
-    "name": "Charlotte Scott",
-    "gender": "Female",
-    "level": 1,
-    "shifts": 8,
-    "salary": 53000
   }
 ]
