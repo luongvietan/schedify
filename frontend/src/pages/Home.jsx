@@ -6,17 +6,19 @@ import { ToastContainer } from "react-toastify";
 
 const Home = () => {
   const [employees, setEmployees] = useState([]);
-  const [schedule, setSchedule] = useState({}); // Schedule for each day
-  const [currentWeek, setCurrentWeek] = useState(0); // Week number
+  const [schedule, setSchedule] = useState({});
+  const [currentWeek, setCurrentWeek] = useState(0);
   const [sortedEmployees, setSortedEmployees] = useState([]);
   const [sortOption, setSortOption] = useState({ gender: "", level: "" });
   const [selectedEmployeeSchedule, setSelectedEmployeeSchedule] =
     useState(null);
-  const [draggedEmployee, setDraggedEmployee] = useState(null); // Employee being dragged
+  const [draggedEmployee, setDraggedEmployee] = useState(null);
+  const [changes, setChanges] = useState([]); // Track changes
 
   useEffect(() => {
     const fetchEmployees = async () => {
       const response = await api.get("/api/employees");
+      console.log("Employees fetched:", response.data);
       setEmployees(response.data);
       setSortedEmployees(response.data);
     };
@@ -37,7 +39,12 @@ const Home = () => {
   useEffect(() => {
     const fetchSchedule = async () => {
       const response = await api.get(`/api/schedule/week/${currentWeek}`);
-      setSchedule(response.data.days);
+      console.log("Schedule fetched for week", currentWeek, ":", response.data);
+      const scheduleData = response.data.days.reduce((acc, day) => {
+        acc[day.date] = day.shifts;
+        return acc;
+      }, {});
+      setSchedule(scheduleData);
     };
 
     if (currentWeek > 0) {
@@ -55,14 +62,17 @@ const Home = () => {
       sorted = sorted.filter((emp) => emp.level === parseInt(sortOption.level));
     }
 
+    console.log("Sorted employees:", sorted);
     setSortedEmployees(sorted);
   }, [sortOption, employees]);
 
   const handleDragStart = (employee) => {
-    setDraggedEmployee(employee); // Store dragged employee
+    console.log("Drag started for employee:", employee);
+    setDraggedEmployee(employee);
   };
 
   const handleDrop = (day, shift) => {
+    console.log("Drop event on day:", day, "shift:", shift);
     if (
       schedule[day]?.[shift]?.some((emp) => emp._id === draggedEmployee._id)
     ) {
@@ -77,15 +87,35 @@ const Home = () => {
         [shift]: [...(schedule[day]?.[shift] || []), draggedEmployee],
       },
     };
+    console.log("Updated schedule:", updatedSchedule);
     setSchedule(updatedSchedule);
+    setChanges([...changes, { employeeId: draggedEmployee._id, day, shift }]);
+  };
 
-    // Call API to update schedule in database
-    api.put("/api/schedule/update", {
-      employeeId: draggedEmployee._id,
+  const handleCellClick = (employee, day, shift) => {
+    console.log(
+      "Cell clicked for employee:",
+      employee,
+      "day:",
       day,
-      shift,
-      week: currentWeek,
-    });
+      "shift:",
+      shift
+    );
+    if (schedule[day]?.[shift]?.some((emp) => emp._id === employee._id)) {
+      toast.error("Employee already assigned to this shift!");
+      return;
+    }
+
+    const updatedSchedule = {
+      ...schedule,
+      [day]: {
+        ...schedule[day],
+        [shift]: [...(schedule[day]?.[shift] || []), employee],
+      },
+    };
+    console.log("Updated schedule:", updatedSchedule);
+    setSchedule(updatedSchedule);
+    setChanges([...changes, { employeeId: employee._id, day, shift }]);
   };
 
   const showEmployeeSchedule = (employee) => {
@@ -97,29 +127,56 @@ const Home = () => {
       });
       return acc;
     }, []);
+    console.log("Schedule for employee:", employee, ":", employeeSchedule);
     setSelectedEmployeeSchedule(employeeSchedule);
+  };
+
+  const getStartOfWeek = (date) => {
+    const day = date.getDay();
+    const diff = date.getDate() - day + (day === 0 ? -6 : 1);
+    return new Date(date.setDate(diff));
   };
 
   const formatDate = (dayOfWeek) => {
     const currentDate = new Date();
-    const currentDay = currentDate.getDay();
-    const diff = dayOfWeek - currentDay;
-    const resultDate = new Date(currentDate);
-    resultDate.setDate(currentDate.getDate() + diff);
-    return resultDate.toLocaleDateString();
+    const startOfWeek = getStartOfWeek(currentDate);
+    const resultDate = new Date(startOfWeek);
+    resultDate.setDate(startOfWeek.getDate() + dayOfWeek);
+    return resultDate.toLocaleDateString("en-GB");
+  };
+
+  const saveChanges = async () => {
+    if (window.confirm("Are you sure you want to save the changes?")) {
+      try {
+        await Promise.all(
+          changes.map((change) =>
+            api.put("/api/schedule/update", {
+              employeeId: change.employeeId,
+              day: change.day,
+              shift: change.shift,
+              week: currentWeek,
+            })
+          )
+        );
+        toast.success("Changes have been saved successfully!");
+        setChanges([]);
+      } catch (error) {
+        toast.error("An error occurred while saving changes!");
+      }
+    }
   };
 
   const daysOfWeek = [
-    { name: "Monday", index: 1 },
-    { name: "Tuesday", index: 2 },
-    { name: "Wednesday", index: 3 },
-    { name: "Thursday", index: 4 },
-    { name: "Friday", index: 5 },
-    { name: "Saturday", index: 6 },
-    { name: "Sunday", index: 0 },
+    { name: "Monday", index: 0 },
+    { name: "Tuesday", index: 1 },
+    { name: "Wednesday", index: 2 },
+    { name: "Thursday", index: 3 },
+    { name: "Friday", index: 4 },
+    { name: "Saturday", index: 5 },
+    { name: "Sunday", index: 6 },
   ];
 
-  const shifts = ["Ca1", "Ca2", "Ca3"];
+  const shifts = ["Shift 1", "Shift 2", "Shift 3"];
 
   return (
     <div className="container mx-auto p-4">
@@ -127,36 +184,45 @@ const Home = () => {
         <h2 className="text-xl font-bold">Current Week: {currentWeek}</h2>
       </div>
 
-      <div className="mb-4">
-        <select
-          onChange={(e) =>
-            setSortOption({ ...sortOption, gender: e.target.value })
-          }
-          className="border p-2 mr-2"
-        >
-          <option value="">All Genders</option>
-          <option value="Male">Male</option>
-          <option value="Female">Female</option>
-        </select>
+      <div className="mb-4 flex justify-between items-center">
+        <div>
+          <select
+            onChange={(e) =>
+              setSortOption({ ...sortOption, gender: e.target.value })
+            }
+            className="border p-2 mr-2"
+          >
+            <option value="">All Genders</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+          </select>
 
-        <select
-          onChange={(e) =>
-            setSortOption({ ...sortOption, level: e.target.value })
-          }
-          className="border p-2"
+          <select
+            onChange={(e) =>
+              setSortOption({ ...sortOption, level: e.target.value })
+            }
+            className="border p-2"
+          >
+            <option value="">All Levels</option>
+            <option value="1">Level 1</option>
+            <option value="2">Level 2</option>
+            <option value="3">Level 3</option>
+          </select>
+        </div>
+
+        <button
+          onClick={saveChanges}
+          className="bg-blue-500 text-white p-2 rounded"
         >
-          <option value="">All Levels</option>
-          <option value="1">Level 1</option>
-          <option value="2">Level 2</option>
-          <option value="3">Level 3</option>
-        </select>
+          Save Changes
+        </button>
       </div>
 
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white">
           <thead>
             <tr>
-              <th className="py-2 px-4 border">STT</th>
+              <th className="py-2 px-4 border">No</th>
               <th className="py-2 px-4 border">Name</th>
               <th className="py-2 px-6 border">Shift</th>
               {daysOfWeek.map((day) => (
@@ -182,18 +248,21 @@ const Home = () => {
                       key={day.name}
                       className="py-2 px-4 border"
                       onDragOver={(e) => e.preventDefault()}
-                      onDrop={() => handleDrop(day.name, "Ca1")}
+                      onDrop={() => handleDrop(day.name, "Shift 1")}
+                      onClick={() =>
+                        handleCellClick(employee, day.name, "Shift 1")
+                      }
                     >
-                      {(Array.isArray(schedule[day.name]?.["Ca1"])
-                        ? schedule[day.name]["Ca1"]
+                      {(Array.isArray(schedule[day.name]?.["Shift 1"])
+                        ? schedule[day.name]["Shift 1"]
                         : []
                       ).map((emp) =>
-                        emp ? (
+                        employees.find((e) => e._id === emp._id) ? (
                           <div
                             key={emp._id}
                             className="bg-white p-2 mb-2 shadow"
                           >
-                            {emp.name}
+                            {employees.find((e) => e._id === emp._id).name}
                           </div>
                         ) : null
                       )}
@@ -207,18 +276,21 @@ const Home = () => {
                       key={day.name}
                       className="py-2 px-4 border"
                       onDragOver={(e) => e.preventDefault()}
-                      onDrop={() => handleDrop(day.name, "Ca2")}
+                      onDrop={() => handleDrop(day.name, "Shift 2")}
+                      onClick={() =>
+                        handleCellClick(employee, day.name, "Shift 2")
+                      }
                     >
-                      {(Array.isArray(schedule[day.name]?.["Ca2"])
-                        ? schedule[day.name]["Ca2"]
+                      {(Array.isArray(schedule[day.name]?.["Shift 2"])
+                        ? schedule[day.name]["Shift 2"]
                         : []
                       ).map((emp) =>
-                        emp ? (
+                        employees.find((e) => e._id === emp._id) ? (
                           <div
                             key={emp._id}
                             className="bg-white p-2 mb-2 shadow"
                           >
-                            {emp.name}
+                            {employees.find((e) => e._id === emp._id).name}
                           </div>
                         ) : null
                       )}
@@ -232,18 +304,21 @@ const Home = () => {
                       key={day.name}
                       className="py-2 px-4 border"
                       onDragOver={(e) => e.preventDefault()}
-                      onDrop={() => handleDrop(day.name, "Ca3")}
+                      onDrop={() => handleDrop(day.name, "Shift 3")}
+                      onClick={() =>
+                        handleCellClick(employee, day.name, "Shift 3")
+                      }
                     >
-                      {(Array.isArray(schedule[day.name]?.["Ca3"])
-                        ? schedule[day.name]["Ca3"]
+                      {(Array.isArray(schedule[day.name]?.["Shift 3"])
+                        ? schedule[day.name]["Shift 3"]
                         : []
                       ).map((emp) =>
-                        emp ? (
+                        employees.find((e) => e._id === emp._id) ? (
                           <div
                             key={emp._id}
                             className="bg-white p-2 mb-2 shadow"
                           >
-                            {emp.name}
+                            {employees.find((e) => e._id === emp._id).name}
                           </div>
                         ) : null
                       )}
