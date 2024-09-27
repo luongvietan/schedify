@@ -2,6 +2,12 @@ const express = require("express");
 const Employee = require("../models/Employee");
 const router = express.Router();
 
+// Tính lương dựa trên level và số shifts
+const calculateSalary = (level, shifts) => {
+  const rates = { 1: 110000, 2: 125000, 3: 150000 };
+  return rates[level] * shifts;
+};
+
 // Lấy danh sách nhân viên
 router.get("/", async (req, res) => {
   const employees = await Employee.find();
@@ -25,9 +31,15 @@ router.get("/:employeeCode", async (req, res) => {
 
 // Thêm nhân viên mới
 router.post("/", async (req, res) => {
-  const newEmployee = new Employee(req.body);
-  await newEmployee.save();
-  res.status(201).json(newEmployee);
+  try {
+    const { level, shifts } = req.body;
+    const salary = calculateSalary(level, shifts); // Tính lương
+    const newEmployee = new Employee({ ...req.body, salary });
+    await newEmployee.save();
+    res.status(201).json(newEmployee);
+  } catch (err) {
+    res.status(500).json({ message: "Lỗi khi thêm nhân viên" });
+  }
 });
 
 // Xóa nhân viên
@@ -54,17 +66,16 @@ router.put("/reset", async (req, res) => {
 // Sửa thông tin nhân viên
 router.put("/:employeeCode", async (req, res) => {
   try {
-    const employeeCode = req.params.employeeCode;
+    const { level, shifts } = req.body;
+    const salary = calculateSalary(level, shifts); // Tính lương
     const updatedEmployee = await Employee.findOneAndUpdate(
-      { employeeCode }, // Tìm theo employeeCode
-      req.body,
-      { new: true, runValidators: true } // Trả về đối tượng mới và kiểm tra dữ liệu
+      { employeeCode: req.params.employeeCode },
+      { ...req.body, salary }, // Cập nhật salary
+      { new: true, runValidators: true }
     );
-
     if (!updatedEmployee) {
       return res.status(404).json({ message: "Nhân viên không tồn tại" });
     }
-
     res.status(200).json(updatedEmployee);
   } catch (err) {
     res.status(500).json({ message: "Lỗi khi sửa thông tin nhân viên" });

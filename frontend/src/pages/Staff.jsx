@@ -323,15 +323,16 @@ const Staff = () => {
                   <input
                     type="number"
                     className="block w-full p-2 pl-10 text-sm text-gray-700 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
-                    value={newEmployee.shifts}
+                    value={selectedEmployee.shifts}
                     onChange={(e) =>
-                      setNewEmployee({
-                        ...newEmployee,
+                      setSelectedEmployee({
+                        ...selectedEmployee,
                         shifts: parseInt(e.target.value),
                       })
                     }
                   />
                 </div>
+
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700">
                     Salary
