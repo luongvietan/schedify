@@ -18,7 +18,7 @@ const Home = () => {
   useEffect(() => {
     const fetchEmployees = async () => {
       const response = await api.get("/api/employees");
-      console.log("Employees fetched:", response.data);
+      // console.log("Employees fetched:", response.data);
       setEmployees(response.data);
       setSortedEmployees(response.data);
     };
@@ -27,26 +27,26 @@ const Home = () => {
 
     const currentDate = new Date();
     const startOfYear = new Date(currentDate.getFullYear(), 0, 1);
+    // console.log(currentDate, startOfYear);
     const weekNumber = Math.ceil(
       ((currentDate - startOfYear) / (24 * 60 * 60 * 1000) +
         startOfYear.getDay() +
         1) /
         7
     );
-    setCurrentWeek(weekNumber - 1);
+    setCurrentWeek(weekNumber);
   }, []);
 
   useEffect(() => {
     const fetchSchedule = async () => {
       const response = await api.get(`/api/schedule/week/${currentWeek}`);
       console.log("Schedule fetched for week", currentWeek, ":", response.data);
-      const scheduleData = response.data.days.reduce((acc, day) => {
-        acc[day.date] = day.shifts;
-        return acc;
-      }, {});
-      setSchedule(scheduleData);
+      // const scheduleData = response.data.days.reduce((acc, day) => {
+      //   acc[day.date] = day.shifts;
+      //   return acc;
+      // }, {});
+      setSchedule(response.data);
     };
-
     if (currentWeek > 0) {
       fetchSchedule();
     }
@@ -61,74 +61,38 @@ const Home = () => {
     if (sortOption.level) {
       sorted = sorted.filter((emp) => emp.level === parseInt(sortOption.level));
     }
-
-    console.log("Sorted employees:", sorted);
     setSortedEmployees(sorted);
   }, [sortOption, employees]);
 
-  const handleDragStart = (employee) => {
-    console.log("Drag started for employee:", employee);
-    setDraggedEmployee(employee);
-  };
-
-  const handleDrop = (day, shift) => {
-    console.log("Drop event on day:", day, "shift:", shift);
+  const handleCellClick = (employee, day, shift) => {
     if (
-      schedule[day]?.[shift]?.some((emp) => emp._id === draggedEmployee._id)
+      schedule.days?.[day.index]?.shifts?.[shift]?.some(
+        (emp) => emp._id === employee._id
+      )
     ) {
       toast.error("Employee already assigned to this shift!");
       return;
     }
-
     const updatedSchedule = {
       ...schedule,
-      [day]: {
-        ...schedule[day],
-        [shift]: [...(schedule[day]?.[shift] || []), draggedEmployee],
-      },
+      days: schedule.days.map((d, i) =>
+        i === day.index
+          ? {
+              ...d,
+              shifts: {
+                ...d.shifts,
+                [shift]: [...(d.shifts[shift] || []), employee.employeeCode],
+              },
+            }
+          : d
+      ),
     };
     console.log("Updated schedule:", updatedSchedule);
     setSchedule(updatedSchedule);
-    setChanges([...changes, { employeeId: draggedEmployee._id, day, shift }]);
-  };
-
-  const handleCellClick = (employee, day, shift) => {
-    console.log(
-      "Cell clicked for employee:",
-      employee,
-      "day:",
-      day,
-      "shift:",
-      shift
-    );
-    if (schedule[day]?.[shift]?.some((emp) => emp._id === employee._id)) {
-      toast.error("Employee already assigned to this shift!");
-      return;
-    }
-
-    const updatedSchedule = {
-      ...schedule,
-      [day]: {
-        ...schedule[day],
-        [shift]: [...(schedule[day]?.[shift] || []), employee],
-      },
-    };
-    console.log("Updated schedule:", updatedSchedule);
-    setSchedule(updatedSchedule);
-    setChanges([...changes, { employeeId: employee._id, day, shift }]);
-  };
-
-  const showEmployeeSchedule = (employee) => {
-    const employeeSchedule = Object.keys(schedule).reduce((acc, day) => {
-      Object.keys(schedule[day] || {}).forEach((shift) => {
-        if (schedule[day][shift]?.some((emp) => emp._id === employee._id)) {
-          acc.push(`${day} - ${shift}`);
-        }
-      });
-      return acc;
-    }, []);
-    console.log("Schedule for employee:", employee, ":", employeeSchedule);
-    setSelectedEmployeeSchedule(employeeSchedule);
+    setChanges([
+      ...changes,
+      { employeeId: employee._id, day: day.name, shift },
+    ]);
   };
 
   const getStartOfWeek = (date) => {
@@ -159,8 +123,10 @@ const Home = () => {
           )
         );
         toast.success("Changes have been saved successfully!");
+        console.log(`Save changed schedule : `, schedule);
         setChanges([]);
       } catch (error) {
+        console.error("Error saving changes:", error); // Thêm dòng này để log lỗi
         toast.error("An error occurred while saving changes!");
       }
     }
@@ -179,173 +145,172 @@ const Home = () => {
   const shifts = ["Shift 1", "Shift 2", "Shift 3"];
 
   return (
-    <div className="container mx-auto p-4">
-      <div className="mb-6">
-        <h2 className="text-xl font-bold">Current Week: {currentWeek}</h2>
-      </div>
-
-      <div className="mb-4 flex justify-between items-center">
-        <div>
-          <select
-            onChange={(e) =>
-              setSortOption({ ...sortOption, gender: e.target.value })
-            }
-            className="border p-2 mr-2"
-          >
-            <option value="">All Genders</option>
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-          </select>
-
-          <select
-            onChange={(e) =>
-              setSortOption({ ...sortOption, level: e.target.value })
-            }
-            className="border p-2"
-          >
-            <option value="">All Levels</option>
-            <option value="1">Level 1</option>
-            <option value="2">Level 2</option>
-            <option value="3">Level 3</option>
-          </select>
+    <>
+      <div className="container mx-auto p-4">
+        <div className="mb-6">
+          <h2 className="text-xl font-bold">Current Week: {currentWeek}</h2>
         </div>
 
-        <button
-          onClick={saveChanges}
-          className="bg-blue-500 text-white p-2 rounded"
-        >
-          Save Changes
-        </button>
-      </div>
+        <div className="mb-4 flex justify-between items-center">
+          <div>
+            <select
+              onChange={(e) =>
+                setSortOption({ ...sortOption, gender: e.target.value })
+              }
+              className="border p-2 mr-2"
+            >
+              <option value="">All Genders</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+            </select>
 
-      <div className="overflow-x-auto">
-        <table className="min-w-full bg-white">
-          <thead>
-            <tr>
-              <th className="py-2 px-4 border">No</th>
-              <th className="py-2 px-4 border">Name</th>
-              <th className="py-2 px-6 border">Shift</th>
-              {daysOfWeek.map((day) => (
-                <th key={day.name} className="py-2 px-4 border">
-                  {day.name} - {formatDate(day.index)}
-                </th>
+            <select
+              onChange={(e) =>
+                setSortOption({ ...sortOption, level: e.target.value })
+              }
+              className="border p-2"
+            >
+              <option value="">All Levels</option>
+              <option value="1">Level 1</option>
+              <option value="2">Level 2</option>
+              <option value="3">Level 3</option>
+            </select>
+          </div>
+
+          <button
+            onClick={saveChanges}
+            className="bg-blue-500 text-white p-2 rounded"
+          >
+            Save Changes
+          </button>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="min-w-full bg-white">
+            <thead>
+              <tr>
+                <th className="py-2 px-4 border">No</th>
+                <th className="py-2 px-4 border">Name</th>
+                <th className="py-2 px-6 border">Shift</th>
+                {daysOfWeek.map((day) => (
+                  <th key={day.name} className="py-2 px-4 border">
+                    {day.name} - {formatDate(day.index)}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {sortedEmployees.map((employee, index) => (
+                <React.Fragment key={employee._id}>
+                  <tr>
+                    <td className="py-2 px-4 border" rowSpan="3">
+                      {index + 1}
+                    </td>
+                    <td className="py-2 px-4 border" rowSpan="3">
+                      {employee.name}
+                    </td>
+                    <td className="py-2 px-4 border">Shift 1</td>
+                    {daysOfWeek.map((day) => (
+                      <td
+                        key={day.name}
+                        className="py-2 px-4 border"
+                        onDragOver={(e) => e.preventDefault()}
+                        onClick={() => handleCellClick(employee, day, "Ca1")}
+                      >
+                        {(Array.isArray(
+                          schedule.days?.[day.index]?.shifts?.["Ca1"]
+                        )
+                          ? schedule.days[day.index].shifts["Ca1"]
+                          : []
+                        ).map((emp) =>
+                          employees.find((e) => e._id === emp._id) ? (
+                            <div
+                              key={emp._id}
+                              className="bg-white p-2 mb-2 shadow"
+                            >
+                              {employees.find((e) => e._id === emp._id).name}
+                            </div>
+                          ) : null
+                        )}
+                      </td>
+                    ))}
+                  </tr>
+                  <tr>
+                    <td className="py-2 px-4 border">Shift 2</td>
+                    {daysOfWeek.map((day) => (
+                      <td
+                        key={day.name}
+                        className="py-2 px-4 border"
+                        onDragOver={(e) => e.preventDefault()}
+                        onClick={() => handleCellClick(employee, day, "Ca2")}
+                      >
+                        {(Array.isArray(
+                          schedule.days?.[day.index]?.shifts?.["Ca2"]
+                        )
+                          ? schedule.days[day.index].shifts["Ca2"]
+                          : []
+                        ).map((emp) =>
+                          employees.find((e) => e._id === emp._id) ? (
+                            <div
+                              key={emp._id}
+                              className="bg-white p-2 mb-2 shadow"
+                            >
+                              {employees.find((e) => e._id === emp._id).name}
+                            </div>
+                          ) : null
+                        )}
+                      </td>
+                    ))}
+                  </tr>
+                  <tr>
+                    <td className="py-2 px-4 border">Shift 3</td>
+                    {daysOfWeek.map((day) => (
+                      <td
+                        key={day.name}
+                        className="py-2 px-4 border"
+                        onDragOver={(e) => e.preventDefault()}
+                        onClick={() => handleCellClick(employee, day, "Ca3")}
+                      >
+                        {(Array.isArray(
+                          schedule.days?.[day.index]?.shifts?.["Ca3"]
+                        )
+                          ? schedule.days[day.index].shifts["Ca3"]
+                          : []
+                        ).map((emp) =>
+                          employees.find((e) => e._id === emp._id) ? (
+                            <div
+                              key={emp._id}
+                              className="bg-white p-2 mb-2 shadow"
+                            >
+                              {employees.find((e) => e._id === emp._id).name}
+                            </div>
+                          ) : null
+                        )}
+                      </td>
+                    ))}
+                  </tr>
+                </React.Fragment>
               ))}
-            </tr>
-          </thead>
-          <tbody>
-            {sortedEmployees.map((employee, index) => (
-              <React.Fragment key={employee._id}>
-                <tr>
-                  <td className="py-2 px-4 border" rowSpan="3">
-                    {index + 1}
-                  </td>
-                  <td className="py-2 px-4 border" rowSpan="3">
-                    {employee.name}
-                  </td>
-                  <td className="py-2 px-4 border">Shift 1</td>
-                  {daysOfWeek.map((day) => (
-                    <td
-                      key={day.name}
-                      className="py-2 px-4 border"
-                      onDragOver={(e) => e.preventDefault()}
-                      onDrop={() => handleDrop(day.name, "Shift 1")}
-                      onClick={() =>
-                        handleCellClick(employee, day.name, "Shift 1")
-                      }
-                    >
-                      {(Array.isArray(schedule[day.name]?.["Shift 1"])
-                        ? schedule[day.name]["Shift 1"]
-                        : []
-                      ).map((emp) =>
-                        employees.find((e) => e._id === emp._id) ? (
-                          <div
-                            key={emp._id}
-                            className="bg-white p-2 mb-2 shadow"
-                          >
-                            {employees.find((e) => e._id === emp._id).name}
-                          </div>
-                        ) : null
-                      )}
-                    </td>
-                  ))}
-                </tr>
-                <tr>
-                  <td className="py-2 px-4 border">Shift 2</td>
-                  {daysOfWeek.map((day) => (
-                    <td
-                      key={day.name}
-                      className="py-2 px-4 border"
-                      onDragOver={(e) => e.preventDefault()}
-                      onDrop={() => handleDrop(day.name, "Shift 2")}
-                      onClick={() =>
-                        handleCellClick(employee, day.name, "Shift 2")
-                      }
-                    >
-                      {(Array.isArray(schedule[day.name]?.["Shift 2"])
-                        ? schedule[day.name]["Shift 2"]
-                        : []
-                      ).map((emp) =>
-                        employees.find((e) => e._id === emp._id) ? (
-                          <div
-                            key={emp._id}
-                            className="bg-white p-2 mb-2 shadow"
-                          >
-                            {employees.find((e) => e._id === emp._id).name}
-                          </div>
-                        ) : null
-                      )}
-                    </td>
-                  ))}
-                </tr>
-                <tr>
-                  <td className="py-2 px-4 border">Shift 3</td>
-                  {daysOfWeek.map((day) => (
-                    <td
-                      key={day.name}
-                      className="py-2 px-4 border"
-                      onDragOver={(e) => e.preventDefault()}
-                      onDrop={() => handleDrop(day.name, "Shift 3")}
-                      onClick={() =>
-                        handleCellClick(employee, day.name, "Shift 3")
-                      }
-                    >
-                      {(Array.isArray(schedule[day.name]?.["Shift 3"])
-                        ? schedule[day.name]["Shift 3"]
-                        : []
-                      ).map((emp) =>
-                        employees.find((e) => e._id === emp._id) ? (
-                          <div
-                            key={emp._id}
-                            className="bg-white p-2 mb-2 shadow"
-                          >
-                            {employees.find((e) => e._id === emp._id).name}
-                          </div>
-                        ) : null
-                      )}
-                    </td>
-                  ))}
-                </tr>
-              </React.Fragment>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {selectedEmployeeSchedule && (
-        <div className="mt-6">
-          <h2 className="text-lg font-bold mb-2">
-            Schedule for Selected Employee:
-          </h2>
-          <ul>
-            {selectedEmployeeSchedule.map((day) => (
-              <li key={day}>{day}</li>
-            ))}
-          </ul>
+            </tbody>
+          </table>
         </div>
-      )}
 
-      <ToastContainer />
-    </div>
+        {selectedEmployeeSchedule && (
+          <div className="mt-6">
+            <h2 className="text-lg font-bold mb-2">
+              Schedule for Selected Employee:
+            </h2>
+            <ul>
+              {selectedEmployeeSchedule.map((day) => (
+                <li key={day}>{day}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        <ToastContainer />
+      </div>
+    </>
   );
 };
 

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import api from "../api";
+import * as XLSX from "xlsx";
 
 const Staff = () => {
   const [employees, setEmployees] = useState([]);
@@ -129,6 +130,13 @@ const Staff = () => {
     return salary.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
   };
 
+  const exportToExcel = () => {
+    const ws = XLSX.utils.json_to_sheet(employees);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Employees");
+    XLSX.writeFile(wb, "employees.xlsx");
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-end mb-4">
@@ -144,10 +152,16 @@ const Staff = () => {
         >
           Reset Month
         </button>
+        <button
+          onClick={exportToExcel}
+          className="text-yellow-700 hover:text-white border border-yellow-700 hover:bg-yellow-800 focus:ring-4 focus:outline-none focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 ml-2"
+        >
+          Export to Excel
+        </button>
       </div>
       <div className="overflow-x-auto">
-        <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-          <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+        <table className="w-full text-sm text-left text-gray-500">
+          <thead className="text-xs text-gray-700 uppercase bg-gray-50 ">
             <tr>
               <th className="px-4 py-3">EID</th>
               <th className="px-4 py-3">Name</th>
@@ -161,7 +175,7 @@ const Staff = () => {
           <tbody>
             {employees.map((employee, index) => (
               <tr
-                className="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
+                className="bg-white border-b "
                 key={`${employee.employeeCode}-${index}`}
               >
                 <td className="px-4 py-4">{employee.employeeCode}</td>
